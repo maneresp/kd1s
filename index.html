@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض فيديو يوتيوب</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 20px;
+            color: #333333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .small-text {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 15px;
+        }
+
+        .video-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>منصة السادس التعليمية</h1>
+        <p>أدخل رابط الفيديو المشفر لعرضه:</p>
+        <form id="videoForm">
+            <input type="text" id="videoUrl" placeholder="أدخل رابط يوتيوب مشفر هنا" required>
+            <button type="submit">تشغيل المحاضرة</button>
+        </form>
+
+        <div id="videoContainer" class="video-container" style="display: none;">
+            <h2>الفيديو:</h2>
+            <iframe id="videoIframe" width="100%" height="315" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
+        <div id="errorMessage" class="small-text" style="display: none;">
+            <p>الرابط المدخل غير صالح أو لا يمكن فك تشفيره. تأكد من إدخال رابط مشفر صحيح.</p>
+        </div>
+
+        <div class="small-text">
+            <p>القناة الرئيسية على التليجرام: <a href="https://t.me/your_main_channel" target="_blank">اضغط هنا</a></p>
+            <p>قناتي الاحتياطية على التليجرام: <a href="https://t.me/your_backup_channel" target="_blank">اضغط هنا</a></p>
+        </div>
+    </div>
+
+    <script>
+        function getEmbedUrl(youtubeUrl) {
+            const url = new URL(youtubeUrl);
+            let videoId = null;
+
+            if (url.hostname === 'www.youtube.com' || url.hostname === 'youtube.com') {
+                const params = new URLSearchParams(url.search);
+                videoId = params.get('v');
+            } else if (url.hostname === 'youtu.be') {
+                videoId = url.pathname.substring(1);
+            }
+
+            if (videoId) {
+                return `https://www.youtube.com/embed/${videoId}?controls=0&rel=0&showinfo=0&modestbranding=1&autohide=1`;
+            }
+            return null;
+        }
+
+        function decodeBase64(base64String) {
+            try {
+                const decodedString = atob(base64String);
+                return decodedString;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        document.getElementById('videoForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const base64Url = document.getElementById('videoUrl').value;
+            const decodedUrl = decodeBase64(base64Url);
+
+            if (decodedUrl) {
+                const embedUrl = getEmbedUrl(decodedUrl);
+                if (embedUrl) {
+                    document.getElementById('videoIframe').src = embedUrl;
+                    document.getElementById('videoContainer').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                } else {
+                    document.getElementById('videoContainer').style.display = 'none';
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            } else {
+                document.getElementById('videoContainer').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
